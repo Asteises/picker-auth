@@ -16,7 +16,7 @@ import java.util.Set;
 public class User {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private String id;
     private String login;
     private String password;

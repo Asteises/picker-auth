@@ -2,7 +2,7 @@ package ru.asteises.pickerauth2.service;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.asteises.pickerauth2.model.User;
@@ -14,10 +14,8 @@ import javax.security.auth.message.AuthException;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-
     private final UserStorage userStorage;
-
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder encoder = new BCryptPasswordEncoder(8);
 
     public User getByLogin(@NonNull String login) throws AuthException {
 
@@ -25,17 +23,16 @@ public class UserService {
                 .orElseThrow(() -> new AuthException("Пользователь не найден"));
     }
 
-    public ResponseEntity<String> registration(UserRegistrationDto userRegistrationDto) {
+    public void registration(UserRegistrationDto userRegistrationDto) {
 
         User user = User.builder()
                 .firstName(userRegistrationDto.getFirstName())
                 .lastName(userRegistrationDto.getLastName())
                 .login(userRegistrationDto.getLogin())
                 .roles(userRegistrationDto.getRoles())
-                .password(passwordEncoder.encode(userRegistrationDto.getPassword()))
+                .password(encoder.encode(userRegistrationDto.getPassword()))
                 .build();
 
         userStorage.save(user);
-        return ResponseEntity.ok("User save in DB");
     }
 }

@@ -8,6 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface UserStorage extends JpaRepository<User, String> {
-
     Optional<User> findByLogin(String login);
 }
