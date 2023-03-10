@@ -55,20 +55,14 @@ public class AuthService {
     объясню позже.
      */
     public JwtResponse login(@NonNull JwtRequest authRequest) throws AuthException {
-
-        final User user = userService.getByLogin(authRequest.getLogin());
-
+        final User user = userService.getByLogin(authRequest.getLogin())
+                .orElseThrow(() -> new AuthException("Пользователь не найден"));
         if (user.getPassword().equals(authRequest.getPassword())) {
-
             final String accessToken = jwtProvider.generateAccessToken(user);
-
             final String refreshToken = jwtProvider.generateRefreshToken(user);
-
             refreshStorage.put(user.getLogin(), refreshToken);
-
             return new JwtResponse(accessToken, refreshToken);
         } else {
-
             throw new AuthException("Неправильный пароль");
         }
     }
@@ -86,7 +80,8 @@ public class AuthService {
             final String login = claims.getSubject();
             final String saveRefreshToken = refreshStorage.get(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
-                final User user = userService.getByLogin(login);
+                final User user = userService.getByLogin(login)
+                        .orElseThrow(() -> new AuthException("Пользователь не найден"));
                 final String accessToken = jwtProvider.generateAccessToken(user);
                 return new JwtResponse(accessToken, null);
             }
@@ -100,7 +95,8 @@ public class AuthService {
             final String login = claims.getSubject();
             final String saveRefreshToken = refreshStorage.get(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
-                final User user = userService.getByLogin(login);
+                final User user = userService.getByLogin(login)
+                        .orElseThrow(() -> new AuthException("Пользователь не найден"));
                 final String accessToken = jwtProvider.generateAccessToken(user);
                 final String newRefreshToken = jwtProvider.generateRefreshToken(user);
                 refreshStorage.put(user.getLogin(), newRefreshToken);

@@ -24,7 +24,7 @@ public class ApiExampleController {
     @PostMapping
     public ResponseEntity<String> registration(UserRegistrationDto userRegistrationDto) {
 
-        userService.registration(userRegistrationDto);
+//        userService.registration(userRegistrationDto);
 
         return ResponseEntity.ok("User create");
     }

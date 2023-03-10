@@ -2,40 +2,30 @@ package ru.asteises.pickerauth2.service;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.asteises.pickerauth2.model.Role;
 import ru.asteises.pickerauth2.model.User;
-import ru.asteises.pickerauth2.model.UserRegistrationDto;
-import ru.asteises.pickerauth2.repisitoryes.UserStorage;
 
-import javax.security.auth.message.AuthException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserStorage userStorage;
+    private final List<User> users;
 
-    private final PasswordEncoder passwordEncoder;
-
-    public User getByLogin(@NonNull String login) throws AuthException {
-
-        return userStorage.findByLogin(login)
-                .orElseThrow(() -> new AuthException("Пользователь не найден"));
+    public UserService() {
+        this.users = List.of(
+                new User("anton", "1234", "Антон", "Иванов", Collections.singleton(Role.USER)),
+                new User("ivan", "12345", "Сергей", "Петров", Collections.singleton(Role.ADMIN))
+        );
     }
 
-    public ResponseEntity<String> registration(UserRegistrationDto userRegistrationDto) {
-
-        User user = User.builder()
-                .firstName(userRegistrationDto.getFirstName())
-                .lastName(userRegistrationDto.getLastName())
-                .login(userRegistrationDto.getLogin())
-                .roles(userRegistrationDto.getRoles())
-                .password(passwordEncoder.encode(userRegistrationDto.getPassword()))
-                .build();
-
-        userStorage.save(user);
-        return ResponseEntity.ok("User save in DB");
+    public Optional<User> getByLogin(@NonNull String login) {
+        return users.stream()
+                .filter(user -> login.equals(user.getLogin()))
+                .findFirst();
     }
 }

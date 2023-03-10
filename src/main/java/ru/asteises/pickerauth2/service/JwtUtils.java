@@ -21,12 +21,10 @@ public final class JwtUtils {
         return jwtInfoToken;
     }
 
-    // todo вот тут непонятно!
     private static Set<Role> getRoles(Claims claims) {
         final List<String> roles = claims.get("roles", List.class);
         return roles.stream()
-                .map(Role)
+                .map(Role::valueOf)
                 .collect(Collectors.toSet());
     }
-
 }
